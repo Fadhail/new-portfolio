@@ -288,3 +288,38 @@
   );
   pointer-events: none;
 }
+
+/* === Skill Bars (Windows 95 Progress Bar Style) === */
+.skill-bar {
+  height: 20px;
+  background: #1a1a2e;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #000000,
+    inset -1px -1px 0 #808080;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff41 0%, #00d4ff 100%);
+  box-shadow: 0 0 10px #00ff41;
+  transition: width 1s ease-out;
+  position: relative;
+}
+
+.skill-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    rgba(0, 0, 0, 0.2) 8px,
+    rgba(0, 0, 0, 0.2) 10px
+  );
+}
