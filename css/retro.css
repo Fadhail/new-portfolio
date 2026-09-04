@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 ::selection {
   background: #ff00ff;
   color: #0a0a0a;
@@ -32,10 +37,10 @@
 /* === Windows 95 Classic Teal Desktop & CRT Styles === */
 body {
   background-color: #008080;
-  /* Classic Win95 dither pattern + CRT monitor vignette */
+  /* Subtle classic Win95 dither pattern + CRT monitor vignette */
   background-image: 
-    radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.4) 100%),
-    repeating-conic-gradient(#008080 0% 25%, #007373 0% 50%) 50% / 4px 4px;
+    radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.25) 100%),
+    repeating-conic-gradient(#008080 0% 25%, #007979 0% 50%) 50% / 4px 4px;
   background-attachment: fixed;
 }
 
@@ -47,15 +52,15 @@ body {
   width: 100%;
   height: 100%;
   z-index: 9999;
-  /* Subtle CRT scanline overlay */
+  /* Halus & transparan: Opacity diperkecil agar tidak mengaburkan teks */
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.04),
+    rgba(0, 0, 0, 0.04) 1px,
     transparent 1px,
-    transparent 2px
+    transparent 3px
   );
-  animation: scanline-flicker 3s infinite;
+  animation: scanline-flicker 4s infinite;
 }
 
 @keyframes scanline-flicker {
@@ -447,42 +452,40 @@ body {
 
 /* Mobile (< 768px) */
 @media (max-width: 767px) {
-  /* Remove window margins */
+  /* Center windows with symmetric margins */
   .win95-window {
-    margin: 0;
-    border-left: none;
-    border-right: none;
-    box-shadow: none;
+    margin: 0 auto 1.5rem auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 2px solid #808080;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
   }
   
   /* Simplify title bar */
   .win95-titlebar {
-    padding: 2px 8px;
+    padding: 3px 6px;
   }
   
   .win95-titlebar-text {
-    font-size: 12px;
+    font-size: 13px;
   }
   
-  /* Reduce content padding */
+  /* Proper mobile content padding */
   .win95-content {
-    padding: 8px;
+    padding: 12px 10px;
   }
   
-  /* CRT Screen sizing */
+  /* CRT Screen sizing & centering */
   .crt-screen {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto;
   }
   
-  /* Hero layout */
-  #home .flex {
-    flex-direction: column;
-    text-align: center;
-  }
-  
+  /* Hero typography */
   #home h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+    line-height: 1.1;
   }
   
   /* Taskbar adjustments */
@@ -492,7 +495,7 @@ body {
   }
   
   .win95-taskbar-btn {
-    padding: 4px 8px;
+    padding: 4px 6px;
     font-size: 12px;
   }
   
@@ -505,11 +508,18 @@ body {
   
   /* Reduce CRT effects for performance */
   .crt-overlay {
-    opacity: 0.5;
+    opacity: 0.35;
   }
   
   .phosphor-glow {
     text-shadow: 0 0 5px currentColor;
+  }
+
+  /* Disable translate animations on mobile to prevent horizontal scroll/off-centering */
+  section:nth-child(odd) .win95-window,
+  section:nth-child(even) .win95-window {
+    animation: none !important;
+    transform: none !important;
   }
 }
 
