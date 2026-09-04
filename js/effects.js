@@ -2,11 +2,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const typedText = document.getElementById('typed-text');
   const texts = [
-    'whoami',
-    'dir /s *.js',
-    'npm run dev',
-    'git commit -m "hello world"',
-    'echo "Welcome to my portfolio"'
+    'whoami -> Mochammad Fadhail',
+    'go run main.go (SITOR Emotion Detector)',
+    'arduino-cli compile --fqbn avr:uno Absenza.ino',
+    'python drone_flight_stabilizer.py',
+    'git commit -m "feat: Connect physical & digital worlds"'
   ];
   let textIndex = 0;
   let charIndex = 0;
