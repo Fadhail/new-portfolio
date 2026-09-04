@@ -323,3 +323,57 @@
     rgba(0, 0, 0, 0.2) 10px
   );
 }
+
+/* === Project Cards === */
+.project-card {
+  background: #0d0d0d;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #000000,
+    inset -1px -1px 0 #808080;
+  transition: all 0.3s ease;
+}
+
+.project-card:hover {
+  box-shadow:
+    0 0 15px rgba(0, 212, 255, 0.3),
+    inset 1px 1px 0 #000000,
+    inset -1px -1px 0 #808080;
+  transform: translateY(-4px);
+}
+
+.project-preview {
+  border-bottom: 2px solid #808080;
+  overflow: hidden;
+}
+
+.crt-screen-mini {
+  background: #0a0a0a;
+  padding: 16px;
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crt-screen-mini::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 65, 0.02),
+    rgba(0, 255, 65, 0.02) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+.project-info {
+  padding: 16px;
+}
