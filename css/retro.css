@@ -421,3 +421,101 @@
   font-size: 12px;
   color: #00d4ff;
 }
+
+/* === Responsive Design === */
+
+/* Tablet (768px - 1199px) */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .win95-window {
+    margin: 0.5rem;
+  }
+  
+  .win95-content {
+    padding: 12px;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  /* Remove window margins */
+  .win95-window {
+    margin: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+  }
+  
+  /* Simplify title bar */
+  .win95-titlebar {
+    padding: 2px 8px;
+  }
+  
+  .win95-titlebar-text {
+    font-size: 12px;
+  }
+  
+  /* Reduce content padding */
+  .win95-content {
+    padding: 8px;
+  }
+  
+  /* CRT Screen sizing */
+  .crt-screen {
+    width: 120px;
+    height: 120px;
+  }
+  
+  /* Hero layout */
+  #home .flex {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  #home h1 {
+    font-size: 2rem;
+  }
+  
+  /* Taskbar adjustments */
+  .win95-taskbar {
+    padding: 4px;
+    gap: 4px;
+  }
+  
+  .win95-taskbar-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  /* Hide clock on very small screens */
+  @media (max-width: 400px) {
+    #current-time {
+      display: none;
+    }
+  }
+  
+  /* Reduce CRT effects for performance */
+  .crt-overlay {
+    opacity: 0.5;
+  }
+  
+  .phosphor-glow {
+    text-shadow: 0 0 5px currentColor;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+  .win95-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .win95-action-btn {
+    padding: 12px 24px;
+  }
+  
+  .social-icon-img {
+    width: 56px;
+    height: 56px;
+  }
+}
