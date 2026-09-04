@@ -33,11 +33,6 @@ function openWindow(winId) {
   
   win.classList.remove('is-hidden');
   focusWindow(winId);
-
-  // If mobile, smoothly scroll window into view
-  if (window.innerWidth < 768) {
-    win.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
 }
 
 function closeWindow(winId) {
