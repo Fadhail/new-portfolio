@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Highlight active section on scroll
   window.addEventListener('scroll', () => {
-    let current = '';
+    let current = 'home';
     sections.forEach(section => {
       const sectionTop = section.offsetTop;
       if (scrollY >= sectionTop - 200) {
