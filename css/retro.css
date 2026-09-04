@@ -113,7 +113,150 @@ body {
     inset 1px 1px 0 #ffffff,
     inset -1px -1px 0 #000000,
     4px 4px 0 rgba(0, 0, 0, 0.3);
-  margin: 1rem;
+  margin: 0.5rem auto;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.win95-window.is-inactive .win95-titlebar {
+  background: linear-gradient(90deg, #707070 0%, #909090 100%) !important;
+}
+
+.win95-window.is-inactive .win95-titlebar-text {
+  color: #c0c0c0 !important;
+  text-shadow: none !important;
+}
+
+.win95-window.is-hidden {
+  display: none !important;
+}
+
+.win95-window.is-maximized {
+  position: fixed !important;
+  top: 10px !important;
+  left: 10px !important;
+  right: 10px !important;
+  bottom: 50px !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  z-index: 500 !important;
+}
+
+.win95-window.is-maximized .win95-content {
+  max-height: calc(100vh - 100px) !important;
+}
+
+/* Desktop Icons Grid */
+.desktop-shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.desktop-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 76px;
+  padding: 6px 4px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px dotted transparent;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+
+.desktop-icon-item:hover, .desktop-icon-item:focus {
+  background: rgba(0, 0, 128, 0.45);
+  border: 1px dotted #ffffff;
+}
+
+.desktop-icon-item:active {
+  background: rgba(0, 0, 128, 0.75);
+}
+
+.desktop-icon-img {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 3px;
+  filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
+}
+
+.desktop-icon-title {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.1;
+  text-shadow: 1px 1px 2px #000000;
+  word-break: break-word;
+}
+
+/* Start Menu Popup */
+.win95-start-menu {
+  position: fixed;
+  bottom: 40px;
+  left: 0;
+  width: 250px;
+  background: #c0c0c0;
+  border: 2px solid #ffffff;
+  border-right-color: #000000;
+  border-bottom-color: #000000;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+  display: flex;
+  z-index: 2500;
+  font-family: 'VT323', monospace;
+}
+
+.win95-start-menu.is-hidden {
+  display: none !important;
+}
+
+.win95-start-sidebar {
+  background: linear-gradient(180deg, #000080 0%, #1084d0 100%);
+  width: 34px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 4px;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 3px;
+  font-size: 19px;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.win95-start-items {
+  flex: 1;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.win95-start-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  color: #000000;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.05s;
+}
+
+.win95-start-item:hover {
+  background: #000080;
+  color: #ffffff;
+}
+
+.win95-start-divider {
+  height: 1px;
+  background: #808080;
+  border-bottom: 1px solid #ffffff;
+  margin: 4px 6px;
 }
 
 /* Title Bar */
@@ -173,6 +316,8 @@ body {
 .win95-content {
   padding: 16px;
   border-top: 1px solid #808080;
+  max-height: calc(85vh - 90px);
+  overflow-y: auto;
 }
 
 /* Windows 95 Button */
