@@ -40,3 +40,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
   type();
 });
+
+// Taskbar Navigation
+document.addEventListener('DOMContentLoaded', () => {
+  const taskbarBtns = document.querySelectorAll('.win95-taskbar-btn');
+  const sections = document.querySelectorAll('section');
+  
+  taskbarBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sectionId = btn.dataset.section;
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+  
+  // Highlight active section on scroll
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (scrollY >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    taskbarBtns.forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.section === current) {
+        btn.classList.add('active');
+      }
+    });
+  });
+  
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-US', { hour12: false });
+    document.getElementById('current-time').textContent = time;
+  }
+  
+  updateClock();
+  setInterval(updateClock, 1000);
+});
