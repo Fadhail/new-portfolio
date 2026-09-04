@@ -161,3 +161,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 10000);
   }
 });
+
+// Contact Form Handler
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inputs = form.querySelectorAll('input, textarea');
+    for (const input of inputs) {
+      if (!input.value.trim()) {
+        input.focus();
+        return;
+      }
+    }
+    const msg = document.createElement('div');
+    msg.textContent = 'Message sent! (Demo)';
+    msg.style.cssText = 'color:#00ff41;font-family:VT323,monospace;font-size:1.25rem;margin-top:0.75rem;text-align:center;';
+    form.appendChild(msg);
+    form.reset();
+    setTimeout(() => msg.remove(), 4000);
+  });
+});
