@@ -1,0 +1,89 @@
+/* === Base Reset & CRT Global Styles === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #ff00ff;
+  color: #0a0a0a;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+  border: 1px solid #808080;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #808080 0%, #606060 100%);
+  border: 1px solid #808080;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #909090 0%, #707070 100%);
+}
+
+/* CRT Scanline Overlay */
+.crt-overlay {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 65, 0.03),
+    rgba(0, 255, 65, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  animation: scanline-flicker 3s infinite;
+}
+
+@keyframes scanline-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
+}
+
+/* Phosphor Glow Effect */
+.phosphor-glow {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+.phosphor-glow-subtle {
+  text-shadow: 0 0 5px currentColor;
+}
+
+/* Neon Box Glow */
+.neon-box-cyan {
+  box-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff, inset 0 0 10px rgba(0, 212, 255, 0.1);
+}
+
+.neon-box-magenta {
+  box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, inset 0 0 10px rgba(255, 0, 255, 0.1);
+}
+
+/* Vignette Effect */
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}

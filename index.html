@@ -3,46 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+  <title>Portfolio.exe | 90s Retro-Tech</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: VT323 (pixel/terminal font) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- Custom Retro Styles -->
+  <link rel="stylesheet" href="css/retro.css">
+  
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'crt-black': '#0a0a0a',
+            'crt-dark': '#1a1a2e',
+            'neon-green': '#00ff41',
+            'neon-cyan': '#00d4ff',
+            'neon-magenta': '#ff00ff',
+            'win95-blue': '#000080',
+            'win95-gray': '#808080',
+            'win95-yellow': '#ffcc00',
+          },
+          fontFamily: {
+            'pixel': ['VT323', 'monospace'],
+          },
+        },
+      },
     }
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      background: rgba(0, 0, 0, 0.3);
-    }
-    nav .logo { font-size: 1.4rem; font-weight: bold; letter-spacing: 2px; }
-    nav ul { list-style: none; display: flex; gap: 1.5rem; }
-    nav ul a { color: #fff; text-decoration: none; font-size: 0.95rem; transition: opacity 0.2s; }
-    nav ul a:hover { opacity: 0.7; }
-    .hero {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: calc(100vh - 60px);
-    }
-    .hero h1 { font-size: 4rem; letter-spacing: 4px; }
-  </style>
+  </script>
 </head>
-<body>
-  <nav>
-    <div class="logo">MySite</div>
-    <ul>
-      <li><a href="#">Home</a></li>
-      <li><a href="#">About</a></li>
-      <li><a href="#">Contact</a></li>
-    </ul>
-  </nav>
-  <div class="hero">
-    <h1>Hello World</h1>
-  </div>
+<body class="bg-crt-black font-pixel text-neon-green min-h-screen">
+  
+  <!-- Content will go here -->
+  
 </body>
 </html>
