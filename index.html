@@ -39,27 +39,70 @@
     }
   </script>
 </head>
-<body class="bg-crt-black font-pixel text-neon-green min-h-screen">
+<body class="bg-crt-black font-pixel text-neon-green min-h-screen pb-16">
   
-  <!-- CRT Overlay Effects -->
+  <!-- CRT Scanline Overlay -->
   <div class="crt-overlay"></div>
+  
+  <!-- Vignette Effect -->
   <div class="vignette"></div>
   
-  <!-- Test Window -->
-  <div class="win95-window max-w-md mx-auto mt-20">
-    <div class="win95-titlebar">
-      <span class="win95-titlebar-text">test.exe</span>
-      <div class="win95-titlebar-buttons">
-        <button class="win95-btn">─</button>
-        <button class="win95-btn">□</button>
-        <button class="win95-btn">×</button>
+  <!-- Hero Section -->
+  <section id="home" class="min-h-screen flex items-center justify-center p-8">
+    <div class="win95-window w-full max-w-4xl">
+      <div class="win95-titlebar">
+        <span class="win95-titlebar-text">hello.exe</span>
+        <div class="win95-titlebar-buttons">
+          <button class="win95-btn">─</button>
+          <button class="win95-btn">□</button>
+          <button class="win95-btn">×</button>
+        </div>
+      </div>
+      <div class="win95-content">
+        <div class="flex flex-col md:flex-row items-center gap-8">
+          
+          <!-- CRT Screen (Pixel Avatar) -->
+          <div class="flex-shrink-0">
+            <div class="crt-screen w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
+              <div class="text-6xl md:text-8xl phosphor-glow">您的名字</div>
+            </div>
+          </div>
+          
+          <!-- Text Content -->
+          <div class="flex-1 text-center md:text-left">
+            <h1 class="text-4xl md:text-6xl mb-4 phosphor-glow">
+              HELLO WORLD!
+            </h1>
+            <div class="text-xl md:text-2xl text-neon-cyan mb-2">
+              I'm <span class="text-neon-magenta">[Your Name]</span>
+            </div>
+            <div class="text-lg md:text-xl text-neon-cyan mb-6">
+              Full Stack Developer
+            </div>
+            
+            <!-- Terminal Typing Effect -->
+            <div class="bg-black p-4 border-2 border-win95-gray">
+              <span class="text-neon-green">C:\&gt;</span>
+              <span id="typed-text" class="text-neon-green"></span>
+              <span class="animate-pulse">_</span>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div class="flex gap-4 mt-8 justify-center md:justify-start">
+              <a href="#projects" class="win95-action-btn neon-box-cyan">
+                View Projects
+              </a>
+              <a href="#contact" class="win95-action-btn neon-box-magenta">
+                Contact Me
+              </a>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </div>
-    <div class="win95-content">
-      <p class="text-lg">Windows 95 style working!</p>
-      <button class="win95-action-btn mt-4">Click Me</button>
-    </div>
-  </div>
+  </section>
   
+  <script src="js/effects.js"></script>
 </body>
 </html>
