@@ -5,6 +5,13 @@
   box-sizing: border-box;
 }
 
+:root {
+  --taskbar-height: 52px;
+  --app-height: 100dvh;
+  --font-pixel: 'VT323', monospace;
+  --font-readable: Verdana, Arial, sans-serif;
+}
+
 html, body {
   overflow: hidden;
   height: 100%;
@@ -15,7 +22,7 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  user-select: none;
+  user-select: auto;
 }
 
 ::selection {
@@ -50,6 +57,7 @@ body {
     radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.25) 100%),
     repeating-conic-gradient(#008080 0% 25%, #007979 0% 50%) 50% / 4px 4px;
   background-attachment: fixed;
+  font-family: var(--font-pixel);
 }
 
 .crt-overlay {
@@ -115,8 +123,9 @@ body {
 
 /* Desktop Container Layout */
 #desktop-area {
-  height: calc(100dvh - 38px);
-  max-height: calc(100dvh - 38px);
+  height: calc(var(--app-height) - var(--taskbar-height));
+  max-height: calc(var(--app-height) - var(--taskbar-height));
+  min-height: 0 !important;
   overflow: hidden;
   position: relative;
 }
@@ -126,6 +135,9 @@ body {
   max-height: 100%;
   overflow: hidden;
   position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 0 !important;
 }
 
 /* Window Frame */
@@ -136,11 +148,34 @@ body {
     inset 1px 1px 0 #ffffff,
     inset -1px -1px 0 #000000,
     4px 4px 0 rgba(0, 0, 0, 0.3);
-  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(calc(100% - 32px), 900px);
+  margin: 0;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  max-height: calc(100% - 24px);
+  min-width: 0;
+  transform: translate(-50%, -50%);
+  transition: box-shadow 0.15s ease;
+  outline: none;
+}
+
+#win-projects {
+  width: min(calc(100% - 32px), 1080px);
+}
+
+#win-contact {
+  width: min(calc(100% - 32px), 720px);
+}
+
+.win95-window:focus-visible {
+  box-shadow:
+    0 0 0 2px #ffcc00,
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000,
+    4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .win95-window.is-inactive .win95-titlebar {
@@ -161,13 +196,14 @@ body {
   top: 8px !important;
   left: 8px !important;
   right: 8px !important;
-  bottom: 44px !important;
+  bottom: calc(var(--taskbar-height) + 4px) !important;
   width: auto !important;
   max-width: none !important;
   height: auto !important;
   max-height: none !important;
   margin: 0 !important;
-  z-index: 500 !important;
+  z-index: 500;
+  transform: none !important;
 }
 
 .win95-window.is-maximized .win95-content {
@@ -178,9 +214,10 @@ body {
 /* Desktop Icons Grid */
 .desktop-shortcuts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  grid-template-columns: 76px;
   gap: 12px;
-  width: 100%;
+  width: 84px;
+  flex: 0 0 84px;
 }
 
 .desktop-icon-item {
@@ -195,6 +232,9 @@ body {
   border: 1px dotted transparent;
   border-radius: 2px;
   transition: background 0.1s;
+  background: transparent;
+  color: inherit;
+  font: inherit;
 }
 
 .desktop-icon-item:hover, .desktop-icon-item:focus {
@@ -274,6 +314,11 @@ body {
   font-size: 16px;
   cursor: pointer;
   transition: all 0.05s;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
 }
 
 .win95-start-item:hover {
@@ -313,8 +358,8 @@ body {
 
 /* Title Bar Buttons */
 .win95-btn {
-  width: 18px;
-  height: 18px;
+  width: 30px;
+  height: 30px;
   background: #c0c0c0;
   border: 1px solid #808080;
   box-shadow:
@@ -323,7 +368,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   padding: 0;
@@ -345,8 +390,108 @@ body {
 .win95-content {
   padding: 16px;
   border-top: 1px solid #808080;
-  max-height: calc(85vh - 90px);
+  max-height: calc(var(--app-height) - var(--taskbar-height) - 72px);
   overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.win95-content p,
+.project-info,
+.contact-panel,
+.readable-text {
+  font-family: var(--font-readable);
+}
+
+.profile-summary,
+.about-copy,
+.project-info p {
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.window-divider,
+.dialog-divider {
+  height: 2px;
+  margin: 0 0 20px;
+  background: #606060;
+  border-bottom: 1px solid #b8b8b8;
+}
+
+.dialog-divider {
+  margin-bottom: 16px;
+}
+
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 10px;
+  list-style: none;
+}
+
+.capability-item {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  background: #101018;
+  border: 2px solid #707070;
+  box-shadow: inset 1px 1px 0 #24243e, inset -1px -1px 0 #000000;
+  font-family: var(--font-readable);
+  color: #e5e7eb;
+}
+
+.capability-item > span {
+  font-size: 1.5rem;
+}
+
+.capability-item strong,
+.capability-item div > span {
+  display: block;
+}
+
+.capability-item strong {
+  margin-bottom: 4px;
+  color: #00d4ff;
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
+}
+
+.capability-item div > span {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 18px;
+}
+
+.project-card-header > div {
+  min-width: 0;
+}
+
+.project-card-header > div > span:last-child {
+  overflow-wrap: anywhere;
+}
+
+.primary-action {
+  background: #ffcc00;
+  border-color: #6b5600;
+  box-shadow:
+    inset 2px 2px 0 #fff4a3,
+    inset -2px -2px 0 #5c4900,
+    0 0 12px rgba(255, 204, 0, 0.35);
+}
+
+#contact-status {
+  min-height: 1.4em;
+  color: #000080;
+  font-weight: 700;
 }
 
 /* Windows 95 Button */
@@ -361,6 +506,10 @@ body {
   font-size: 16px;
   cursor: pointer;
   transition: all 0.1s;
+  min-height: 40px;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
 }
 
 .win95-action-btn:hover {
@@ -382,9 +531,10 @@ body {
     inset 1px 1px 0 #000000,
     inset -1px -1px 0 #808080;
   padding: 6px 8px;
-  font-family: 'VT323', monospace;
-  font-size: 14px;
+  font-family: var(--font-readable);
+  font-size: 16px;
   color: #000000;
+  min-height: 44px;
 }
 
 .win95-input:focus {
@@ -403,7 +553,8 @@ body {
   right: 0;
   background: #c0c0c0;
   border-top: 2px solid #ffffff;
-  padding: 4px 8px;
+  height: var(--taskbar-height);
+  padding: 5px 8px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -416,10 +567,13 @@ body {
   box-shadow:
     inset 1px 1px 0 #ffffff,
     inset -1px -1px 0 #000000;
+  min-height: 36px;
   padding: 4px 12px;
   font-family: 'VT323', monospace;
   font-size: 14px;
   cursor: pointer;
+  color: #111111;
+  white-space: nowrap;
 }
 
 .win95-taskbar-btn:hover {
@@ -430,7 +584,18 @@ body {
   box-shadow:
     inset -1px -1px 0 #ffffff,
     inset 1px 1px 0 #000000;
-  background: #b0b0b0;
+  background: #000080;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #ffcc00;
+  outline-offset: 2px;
 }
 
 /* === CRT Screen Effect === */
@@ -626,34 +791,33 @@ body {
 
 /* Mobile (< 768px) */
 @media (max-width: 767px) {
+  :root {
+    --taskbar-height: 54px;
+  }
+
   #desktop-area {
-    height: calc(100dvh - 36px);
-    max-height: calc(100dvh - 36px);
-    padding: 4px;
-    gap: 4px;
+    height: calc(var(--app-height) - var(--taskbar-height));
+    max-height: calc(var(--app-height) - var(--taskbar-height));
+    padding: 6px;
+    gap: 6px;
   }
 
-  /* Desktop horizontal scroll bar on mobile */
   .desktop-shortcuts-grid {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
     width: 100%;
-    padding: 2px 0;
-    gap: 4px;
+    flex: 0 0 auto;
+    padding: 0;
+    gap: 3px;
     flex-shrink: 0;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .desktop-shortcuts-grid::-webkit-scrollbar {
-    display: none;
   }
 
   .desktop-icon-item {
-    width: 60px;
-    flex-shrink: 0;
-    padding: 2px;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 4px 2px;
   }
 
   .desktop-icon-img {
@@ -662,92 +826,179 @@ body {
   }
 
   .desktop-icon-title {
-    font-size: 10px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
   }
 
-  /* Window fits available viewport height smoothly without moving the desktop */
   .win95-window {
-    margin: 0 auto !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
     height: 100%;
+    min-width: 0;
+    transform: none !important;
     border: 2px solid #808080;
     box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .win95-window.is-maximized {
+    position: absolute !important;
+    inset: 0 !important;
   }
   
   /* Simplify title bar */
   .win95-titlebar {
-    padding: 2px 4px;
+    min-height: 44px;
+    padding: 4px 6px;
+    cursor: default;
+    touch-action: manipulation;
   }
   
   .win95-titlebar-text {
-    font-size: 12px;
+    min-width: 0;
+    max-width: calc(100% - 96px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
   }
   
   /* Proper mobile content padding & smooth internal scroll */
   .win95-content {
-    padding: 8px 6px;
+    padding: 12px 10px calc(18px + env(safe-area-inset-bottom));
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    max-height: none;
+    min-height: 0;
     -webkit-overflow-scrolling: touch;
   }
   
   /* CRT Screen sizing & centering */
   .crt-screen {
-    width: 100px;
-    height: 100px;
+    width: 132px !important;
+    height: 132px !important;
     margin: 0 auto;
-    padding: 4px !important;
+    border-width: 6px;
   }
   
   /* Hero typography */
-  #home h1 {
-    font-size: 1.8rem;
+  #main-title {
+    font-size: 2rem;
     line-height: 1.1;
   }
   
   /* Taskbar adjustments */
   .win95-taskbar {
-    padding: 3px 4px;
-    gap: 2px;
-    height: 36px;
+    height: var(--taskbar-height);
+    padding: 4px max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left));
+    gap: 3px;
   }
   
   .win95-taskbar-btn {
+    min-width: 44px;
+    min-height: 44px;
     padding: 3px 5px;
-    font-size: 11px;
+    font-size: 18px;
+    flex: 0 1 52px;
   }
-  
-  /* Hide clock on very small screens */
-  @media (max-width: 400px) {
-    #current-time {
-      display: none;
-    }
+
+  .taskbar-label,
+  .taskbar-divider,
+  .taskbar-status,
+  #btn-sound {
+    display: none !important;
+  }
+
+  #btn-start {
+    flex-basis: 58px;
   }
   
   /* Reduce CRT effects for performance */
   .crt-overlay {
-    opacity: 0.35;
+    opacity: 0.2;
+    animation: none;
   }
   
   .phosphor-glow {
     text-shadow: 0 0 5px currentColor;
   }
 
-  /* Disable translate animations on mobile to prevent horizontal scroll/off-centering */
-  section:nth-child(odd) .win95-window,
-  section:nth-child(even) .win95-window {
-    animation: none !important;
-    transform: none !important;
+  .project-card,
+  .project-card:hover {
+    transform: none;
+  }
+
+  .window-maximize {
+    display: none;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card-header,
+  .contact-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .win95-action-btn {
+    min-height: 44px;
+    width: 100%;
+    padding: 10px 14px;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .hero-actions .primary-action {
+    grid-column: 1 / -1;
+  }
+
+  .hero-layout {
+    gap: 14px;
+  }
+
+  .profile-copy {
+    text-align: center;
+  }
+
+  .terminal-line {
+    overflow-wrap: anywhere;
+    min-height: 54px;
+  }
+
+  .window-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    overflow-wrap: anywhere;
+  }
+
+  .win95-start-menu {
+    bottom: var(--taskbar-height);
+    max-height: calc(var(--app-height) - var(--taskbar-height) - 8px);
+    overflow-y: auto;
   }
 }
 
 /* Touch-friendly adjustments */
 @media (hover: none) and (pointer: coarse) {
   .win95-btn {
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
   }
   
   .win95-action-btn {
@@ -764,7 +1015,7 @@ body {
 
 /* Neon glow intensify on hover */
 .project-card:hover .project-info {
-  text-shadow: 0 0 10px currentColor;
+  text-shadow: none;
 }
 
 /* Button glow animation */
@@ -778,7 +1029,7 @@ body {
 }
 
 .win95-action-btn:hover {
-  animation: neon-pulse 1.5s infinite;
+  animation: none;
 }
 
 /* Window slide-in animation */
@@ -935,13 +1186,21 @@ button, a, .win95-btn, .win95-action-btn, .win95-taskbar-btn, .desktop-icon-item
 }
 
 .context-menu-item {
+  display: block;
+  width: 100%;
   padding: 5px 12px;
   color: #000000;
   cursor: pointer;
   white-space: nowrap;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  text-align: left;
 }
 
-.context-menu-item:hover {
+.context-menu-item:hover,
+.context-menu-item:focus-visible {
   background: #000080;
   color: #ffffff;
 }
@@ -1069,7 +1328,6 @@ body {
   }
 
   .hero h1,
-  .win95-window,
   .crt-overlay,
   .project-card,
   .win95-action-btn {
@@ -1077,6 +1335,10 @@ body {
     transform: none !important;
     text-shadow: none !important;
     box-shadow: none !important;
+  }
+
+  .win95-window {
+    animation: none !important;
   }
 
   .boot-logo {

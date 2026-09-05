@@ -1,88 +1,166 @@
 // Window Manager System
 let highestZ = 20;
+const mobileWindowQuery = window.matchMedia('(max-width: 767px)');
+const lastWindowTrigger = new Map();
+let mobileWindowHistory = ['win-home'];
+
+function isMobileWindowMode() {
+  return mobileWindowQuery.matches;
+}
+
+function setWindowVisibility(win, visible) {
+  win.classList.toggle('is-hidden', !visible);
+  win.inert = !visible;
+  win.setAttribute('aria-hidden', String(!visible));
+}
+
+function updateWindowStates(activeId = null) {
+  document.querySelectorAll('.win95-window').forEach((win) => {
+    const active = win.id === activeId && !win.classList.contains('is-hidden');
+    win.classList.toggle('is-inactive', !active);
+  });
+
+  document.querySelectorAll('[data-window-target]').forEach((button) => {
+    const target = document.getElementById(button.dataset.windowTarget);
+    const active = target?.id === activeId;
+    const label = button.dataset.windowLabel;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-current', active ? 'page' : 'false');
+    if (isMobileWindowMode()) button.setAttribute('aria-label', `Open ${label}`);
+    else if (active) button.setAttribute('aria-label', `Minimize ${label}`);
+    else if (target && !target.classList.contains('is-hidden')) button.setAttribute('aria-label', `Activate ${label}`);
+    else button.setAttribute('aria-label', `Open ${label}`);
+  });
+}
+
+function getTopOpenWindow(excludeId = null) {
+  return [...document.querySelectorAll('.win95-window:not(.is-hidden)')]
+    .filter((win) => win.id !== excludeId)
+    .sort((a, b) => Number(b.style.zIndex || 0) - Number(a.style.zIndex || 0))[0] || null;
+}
+
+function focusWindowElement(win) {
+  requestAnimationFrame(() => win.focus({ preventScroll: true }));
+}
 
 function focusWindow(winId) {
   const win = document.getElementById(winId);
-  if (!win) return;
+  if (!win || win.classList.contains('is-hidden')) return;
   
   highestZ++;
   win.style.zIndex = highestZ;
   
-  // Mark all windows as inactive except this one
-  document.querySelectorAll('.win95-window').forEach(w => {
-    if (w.id === winId) {
-      w.classList.remove('is-inactive');
-    } else {
-      w.classList.add('is-inactive');
-    }
-  });
-
-  // Update taskbar button states
-  document.querySelectorAll('.win95-taskbar-btn').forEach(btn => {
-    if (btn.id === `task-${winId}`) {
-      btn.classList.add('active');
-    } else if (btn.id !== 'btn-start') {
-      btn.classList.remove('active');
-    }
-  });
+  updateWindowStates(winId);
 }
 
 function openWindow(winId) {
   const win = document.getElementById(winId);
   if (!win) return;
-  
-  win.classList.remove('is-hidden');
+
+  const trigger = document.activeElement;
+  if (trigger instanceof HTMLElement && trigger !== document.body && !win.contains(trigger)) {
+    lastWindowTrigger.set(winId, trigger);
+  }
+
+  if (isMobileWindowMode()) {
+    document.querySelectorAll('.win95-window').forEach((candidate) => {
+      setWindowVisibility(candidate, candidate.id === winId);
+    });
+    mobileWindowHistory = mobileWindowHistory.filter((id) => id !== winId);
+    mobileWindowHistory.push(winId);
+  } else {
+    setWindowVisibility(win, true);
+  }
+
   SoundFX.open();
   focusWindow(winId);
+  focusWindowElement(win);
 }
 
 function closeWindow(winId) {
   const win = document.getElementById(winId);
   if (!win) return;
-  
-  win.classList.add('is-hidden');
-  SoundFX.close();
-  const taskBtn = document.getElementById(`task-${winId}`);
-  if (taskBtn) {
-    taskBtn.classList.remove('active');
-  }
 
-  // Focus next available open window
-  const openWindows = Array.from(document.querySelectorAll('.win95-window:not(.is-hidden)'));
-  if (openWindows.length > 0) {
-    focusWindow(openWindows[openWindows.length - 1].id);
+  setWindowVisibility(win, false);
+  win.classList.remove('is-maximized');
+  const maximizeButton = win.querySelector('[data-window-action="maximize"]');
+  if (maximizeButton) {
+    const name = win.dataset.windowName;
+    maximizeButton.textContent = '□';
+    maximizeButton.setAttribute('aria-label', `Maximize ${name} window`);
+    maximizeButton.title = 'Maximize';
   }
+  SoundFX.close();
+  mobileWindowHistory = mobileWindowHistory.filter((id) => id !== winId);
+  activateFallbackWindow(winId);
 }
 
 function minimizeWindow(winId) {
   const win = document.getElementById(winId);
   if (!win) return;
-  
-  win.classList.add('is-hidden');
-  const taskBtn = document.getElementById(`task-${winId}`);
-  if (taskBtn) {
-    taskBtn.classList.remove('active');
+
+  setWindowVisibility(win, false);
+  mobileWindowHistory = mobileWindowHistory.filter((id) => id !== winId);
+  activateFallbackWindow(winId);
+}
+
+function activateFallbackWindow(closedId) {
+  let fallback = null;
+  if (isMobileWindowMode()) {
+    const previousId = mobileWindowHistory[mobileWindowHistory.length - 1] || 'win-home';
+    fallback = document.getElementById(previousId);
+    if (fallback) setWindowVisibility(fallback, true);
+  } else {
+    fallback = getTopOpenWindow(closedId);
   }
 
-  // Focus next available open window
-  const openWindows = Array.from(document.querySelectorAll('.win95-window:not(.is-hidden)'));
-  if (openWindows.length > 0) {
-    focusWindow(openWindows[openWindows.length - 1].id);
+  if (fallback) {
+    focusWindow(fallback.id);
+    const storedTrigger = lastWindowTrigger.get(closedId);
+    const trigger = storedTrigger?.closest?.('#start-menu')
+      ? document.getElementById('btn-start')
+      : storedTrigger;
+    if (trigger instanceof HTMLElement && !trigger.inert && trigger.getClientRects().length > 0) {
+      requestAnimationFrame(() => trigger.focus({ preventScroll: true }));
+    } else {
+      focusWindowElement(fallback);
+    }
+    return;
   }
+
+  updateWindowStates(null);
+  const storedTrigger = lastWindowTrigger.get(closedId);
+  const trigger = storedTrigger?.closest?.('#start-menu')
+    ? document.getElementById('btn-start')
+    : storedTrigger || document.getElementById(`task-${closedId}`);
+  if (trigger instanceof HTMLElement && !trigger.inert) trigger.focus();
 }
 
 function maximizeWindow(winId) {
   const win = document.getElementById(winId);
-  if (!win) return;
-  
+  if (!win || isMobileWindowMode()) return;
+
   win.classList.toggle('is-maximized');
+  const button = win.querySelector('[data-window-action="maximize"]');
+  if (button) {
+    const maximized = win.classList.contains('is-maximized');
+    const name = win.dataset.windowName;
+    button.textContent = maximized ? '❐' : '□';
+    button.setAttribute('aria-label', maximized ? `Restore ${name} window` : `Maximize ${name} window`);
+    button.title = maximized ? 'Restore' : 'Maximize';
+  }
   focusWindow(winId);
 }
 
 function toggleWindow(winId) {
   const win = document.getElementById(winId);
   if (!win) return;
-  
+
+  if (isMobileWindowMode()) {
+    openWindow(winId);
+    return;
+  }
+
   if (win.classList.contains('is-hidden')) {
     openWindow(winId);
   } else if (win.classList.contains('is-inactive')) {
@@ -100,13 +178,13 @@ function toggleStartMenu() {
   
   SoundFX.click();
   const isHidden = menu.classList.toggle('is-hidden');
+  menu.inert = isHidden;
+  menu.setAttribute('aria-hidden', String(isHidden));
   if (btnStart) {
-    if (!isHidden) {
-      btnStart.classList.add('active');
-    } else {
-      btnStart.classList.remove('active');
-    }
+    btnStart.classList.toggle('active', !isHidden);
+    btnStart.setAttribute('aria-expanded', String(!isHidden));
   }
+  if (!isHidden) requestAnimationFrame(() => menu.querySelector('.win95-start-item')?.focus());
 }
 
 // Close Start menu on click outside
@@ -117,8 +195,26 @@ document.addEventListener('click', (e) => {
   
   if (!menu.contains(e.target) && !btnStart.contains(e.target)) {
     menu.classList.add('is-hidden');
-    if (btnStart) btnStart.classList.remove('active');
+    menu.inert = true;
+    menu.setAttribute('aria-hidden', 'true');
+    if (btnStart) {
+      btnStart.classList.remove('active');
+      btnStart.setAttribute('aria-expanded', 'false');
+    }
   }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const menu = document.getElementById('start-menu');
+  const btnStart = document.getElementById('btn-start');
+  if (!menu || menu.classList.contains('is-hidden')) return;
+  menu.classList.add('is-hidden');
+  menu.inert = true;
+  menu.setAttribute('aria-hidden', 'true');
+  btnStart?.classList.remove('active');
+  btnStart?.setAttribute('aria-expanded', 'false');
+  btnStart?.focus();
 });
 
 // Typing Animation
@@ -133,6 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'python drone_flight_stabilizer.py',
     'git commit -m "feat: Connect physical & digital worlds"'
   ];
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    typedText.textContent = texts[0];
+    return;
+  }
   let textIndex = 0;
   let charIndex = 0;
   let isDeleting = false;
@@ -262,34 +363,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Contact Form Direct Transmission Handler
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('form');
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('contact-status');
   if (!form) return;
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const inputs = form.querySelectorAll('input, textarea');
-    for (const input of inputs) {
-      if (!input.value.trim()) {
-        input.focus();
-        return;
-      }
+    if (!form.checkValidity()) {
+      SoundFX.error();
+      if (status) status.textContent = 'Complete all fields with a valid email address.';
+      form.reportValidity();
+      return;
     }
-    const msg = document.createElement('div');
-    msg.textContent = 'Transmission sent successfully! (Demo)';
-    msg.style.cssText = 'color:#00ff41;font-family:VT323,monospace;font-size:1.25rem;margin-top:0.75rem;text-align:center;';
-    form.appendChild(msg);
+    if (status) status.textContent = 'Demo complete. No message was sent.';
     form.reset();
-    setTimeout(() => msg.remove(), 4000);
   });
 });
 
 // === Sound FX Engine (Web Audio API, no assets) ===
 const SoundFX = (() => {
   let ctx = null;
-  let enabled = true;
+  let enabled = false;
 
   try {
-    enabled = localStorage.getItem('fadelos-sound') !== 'off';
+    enabled = localStorage.getItem('fadelos-sound') === 'on';
   } catch (err) { /* private mode: keep default */ }
 
   function ensureCtx() {
@@ -372,10 +469,15 @@ function toggleSound() {
 
 function updateSoundButton() {
   const btn = document.getElementById('btn-sound');
-  if (!btn) return;
   const on = SoundFX.isEnabled();
-  btn.textContent = on ? '🔊' : '🔇';
-  btn.setAttribute('aria-pressed', String(on));
+  if (btn) {
+    btn.textContent = on ? '🔊' : '🔇';
+    btn.title = on ? 'Disable sound effects' : 'Enable sound effects';
+    btn.setAttribute('aria-label', btn.title);
+    btn.setAttribute('aria-pressed', String(on));
+  }
+  const startIcon = document.getElementById('start-sound-icon');
+  if (startIcon) startIcon.textContent = on ? '🔊' : '🔇';
 }
 
 // Click feedback for window control buttons
@@ -538,35 +640,33 @@ function initDrag() {
     if (!win || win.classList.contains('is-maximized')) return;
 
     const rect = win.getBoundingClientRect();
+    const area = workspace.getBoundingClientRect();
     const startX = e.clientX;
     const startY = e.clientY;
+    const initialLeft = rect.left - area.left;
+    const initialTop = rect.top - area.top;
 
-    const cs = getComputedStyle(win);
-    const initialTx = cs.transform && cs.transform !== 'none'
-      ? new DOMMatrix(cs.transform).m41
-      : 0;
-    const initialTy = cs.transform && cs.transform !== 'none'
-      ? new DOMMatrix(cs.transform).m42
-      : 0;
+    win.style.left = `${initialLeft}px`;
+    win.style.top = `${initialTop}px`;
+    win.style.transform = 'none';
 
     focusWindow(win.id);
     win.classList.add('is-dragging');
+    titlebar.setPointerCapture?.(e.pointerId);
 
     const onMove = (ev) => {
-      let tx = initialTx + (ev.clientX - startX);
-      let ty = initialTy + (ev.clientY - startY);
-
-      const area = workspace.getBoundingClientRect();
-      const pad = 40;
-      tx = Math.min(tx, area.width - pad);
-      tx = Math.max(tx, -rect.width + pad);
-      ty = Math.max(ty, -(rect.height - 80));
-
-      win.style.transform = `translate(${tx}px, ${ty}px)`;
+      const currentArea = workspace.getBoundingClientRect();
+      const maxLeft = Math.max(0, currentArea.width - rect.width);
+      const maxTop = Math.max(0, currentArea.height - titlebar.offsetHeight);
+      const left = Math.min(maxLeft, Math.max(0, initialLeft + ev.clientX - startX));
+      const top = Math.min(maxTop, Math.max(0, initialTop + ev.clientY - startY));
+      win.style.left = `${left}px`;
+      win.style.top = `${top}px`;
     };
 
     const onUp = () => {
       win.classList.remove('is-dragging');
+      titlebar.releasePointerCapture?.(e.pointerId);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
@@ -577,15 +677,42 @@ function initDrag() {
 }
 
 // === Desktop Context Menu ===
-function openAboutDialog() {
+let aboutDialogTrigger = null;
+let aboutBackgroundState = [];
+
+function openAboutDialog(trigger = document.activeElement) {
   SoundFX.click();
   const dlg = document.getElementById('about-dialog');
-  if (dlg) dlg.classList.remove('is-hidden');
+  if (!dlg) return;
+  aboutDialogTrigger = trigger;
+  aboutBackgroundState = [
+    document.getElementById('desktop-area'),
+    document.querySelector('.win95-taskbar'),
+    document.getElementById('start-menu'),
+    document.getElementById('context-menu'),
+  ].filter(Boolean).map((element) => ({ element, inert: element.inert }));
+  aboutBackgroundState.forEach(({ element }) => { element.inert = true; });
+  dlg.classList.remove('is-hidden');
+  dlg.inert = false;
+  dlg.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => dlg.querySelector('button')?.focus());
 }
 
 function closeAboutDialog() {
   const dlg = document.getElementById('about-dialog');
-  if (dlg) dlg.classList.add('is-hidden');
+  if (!dlg) return;
+  dlg.classList.add('is-hidden');
+  dlg.inert = true;
+  dlg.setAttribute('aria-hidden', 'true');
+  aboutBackgroundState.forEach(({ element, inert }) => {
+    element.inert = element.classList.contains('is-hidden') ? true : inert;
+  });
+  aboutBackgroundState = [];
+  if (aboutDialogTrigger instanceof HTMLElement && !aboutDialogTrigger.inert && aboutDialogTrigger.getClientRects().length > 0) {
+    aboutDialogTrigger.focus();
+  } else {
+    document.getElementById('btn-start')?.focus();
+  }
 }
 
 function initContextMenu() {
@@ -595,15 +722,20 @@ function initContextMenu() {
 
   function show(x, y) {
     menu.classList.remove('is-hidden');
+    menu.inert = false;
+    menu.setAttribute('aria-hidden', 'false');
     const rect = menu.getBoundingClientRect();
     const xPos = Math.min(x, window.innerWidth - rect.width - 4);
     const yPos = Math.min(y, window.innerHeight - rect.height - 40);
     menu.style.left = `${Math.max(0, xPos)}px`;
     menu.style.top = `${Math.max(0, yPos)}px`;
+    requestAnimationFrame(() => menu.querySelector('.context-menu-item')?.focus());
   }
 
   function hide() {
     menu.classList.add('is-hidden');
+    menu.inert = true;
+    menu.setAttribute('aria-hidden', 'true');
   }
 
   function refreshDesktop() {
@@ -633,7 +765,7 @@ function initContextMenu() {
     switch (item.dataset.action) {
       case 'new-window': openWindow('win-home'); break;
       case 'refresh': refreshDesktop(); break;
-      case 'about': openAboutDialog(); break;
+      case 'about': openAboutDialog(document.getElementById('btn-start')); break;
     }
     hide();
   });
@@ -644,7 +776,10 @@ function initContextMenu() {
   document.addEventListener('scroll', hide, true);
   window.addEventListener('blur', hide);
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') hide();
+    if (e.key === 'Escape') {
+      hide();
+      if (!document.getElementById('about-dialog')?.classList.contains('is-hidden')) closeAboutDialog();
+    }
   });
 }
 
@@ -716,8 +851,50 @@ function initGlitch() {
   setTimeout(glitchTitleBar, 9000 + Math.random() * 8000);
 }
 
+function initViewportSizing() {
+  const viewport = window.visualViewport;
+  const update = () => {
+    const height = viewport ? viewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--app-height', `${height}px`);
+  };
+
+  update();
+  window.addEventListener('resize', update);
+  viewport?.addEventListener('resize', update);
+
+  document.addEventListener('focusin', (e) => {
+    if (!e.target.matches('#contact-form input, #contact-form textarea')) return;
+    setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120);
+  });
+}
+
+function initResponsiveWindowMode() {
+  mobileWindowQuery.addEventListener('change', (event) => {
+    const active = document.querySelector('.win95-window:not(.is-hidden):not(.is-inactive)')
+      || getTopOpenWindow()
+      || document.getElementById('win-home');
+    if (!event.matches) {
+      updateWindowStates(active?.id || null);
+      return;
+    }
+    document.querySelectorAll('.win95-window').forEach((win) => {
+      setWindowVisibility(win, win === active);
+    });
+    if (active) {
+      mobileWindowHistory = [active.id];
+      focusWindow(active.id);
+    }
+  });
+}
+
 // === Init All Enhancements ===
 document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.win95-window').forEach((win) => {
+    setWindowVisibility(win, !win.classList.contains('is-hidden'));
+  });
+  updateWindowStates('win-home');
+  initViewportSizing();
+  initResponsiveWindowMode();
   initBootScreen();
   initParticles();
   initDrag();
