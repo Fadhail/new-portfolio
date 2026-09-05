@@ -40,12 +40,53 @@
   </script>
 </head>
 <body class="font-pixel text-neon-green min-h-screen pb-14">
-  
+
+  <!-- Boot Screen -->
+  <div id="boot-screen" class="boot-screen" aria-label="FADEL-OS 95 booting">
+    <canvas id="boot-noise" class="boot-noise"></canvas>
+    <div class="boot-content">
+      <div class="boot-logo">FADEL-OS 95</div>
+      <div class="boot-progress-track">
+        <div id="boot-progress" class="boot-progress-fill"></div>
+      </div>
+      <div class="boot-status">Loading C:\FADEL\PORTFOLIO.EXE ...</div>
+    </div>
+  </div>
+
   <!-- CRT Scanline Overlay -->
   <div class="crt-overlay"></div>
   
   <!-- Vignette Effect -->
   <div class="vignette"></div>
+
+  <!-- ASCII Particle Layer -->
+  <canvas id="particle-canvas" class="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Desktop Context Menu -->
+  <div id="context-menu" class="context-menu is-hidden" role="menu" aria-label="Desktop menu">
+    <div class="context-menu-item" data-action="new-window">New Window</div>
+    <div class="context-menu-item" data-action="refresh">Refresh Desktop</div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="about">About FADEL-OS 95</div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="close">Close Menu</div>
+  </div>
+
+  <!-- About FADEL-OS Dialog -->
+  <div id="about-dialog" class="about-dialog is-hidden" role="dialog" aria-label="About FADEL-OS 95">
+    <div class="about-dialog-titlebar">
+      <span>About FADEL-OS 95</span>
+      <button class="win95-btn" onclick="closeAboutDialog()" title="Close">×</button>
+    </div>
+    <div class="about-dialog-content">
+      <div class="about-dialog-logo">⚡</div>
+      <div class="about-dialog-text">
+        <div class="text-neon-cyan font-bold">FADEL-OS 95</div>
+        <div class="text-gray-400 text-sm">Retro portfolio by Mochammad Fadhail</div>
+        <div class="text-gray-400 text-sm mt-1">Full Stack &amp; IoT Developer</div>
+      </div>
+    </div>
+  </div>
 
   <!-- Desktop Workspace Area -->
   <main id="desktop-area" class="relative w-full min-h-[calc(100vh-42px)] p-2 sm:p-4 flex flex-col md:flex-row gap-3 items-start">
@@ -106,18 +147,22 @@
         <div class="win95-content">
           <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
             
-            <!-- CRT Screen (Pixel Avatar) -->
+            <!-- CRT Screen (Profile Photo) -->
             <div class="flex-shrink-0 flex justify-center w-full md:w-auto">
-              <div class="crt-screen w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 flex flex-col items-center justify-center text-center p-4 mx-auto">
-                <div class="text-4xl sm:text-5xl md:text-7xl phosphor-glow mb-1">👨💻</div>
-                <div class="text-lg sm:text-xl md:text-2xl text-neon-green phosphor-glow tracking-widest">[ FADEL ]</div>
-                <div class="text-xs text-neon-cyan mt-1">&lt;IOT / FULLSTACK&gt;</div>
+              <div class="crt-screen relative w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 mx-auto overflow-hidden">
+                <img src="img/fadel-profile.webp"
+                     alt="Foto Mochammad Fadhail - Full Stack dan IoT Developer"
+                     class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 bg-black/80 border-t border-win95-gray px-1 py-0.5 text-center">
+                  <div class="text-[9px] sm:text-sm md:text-lg text-neon-green phosphor-glow tracking-widest leading-tight">[ FADEL ]</div>
+                  <div class="text-[7px] sm:text-[10px] md:text-xs text-neon-cyan leading-tight">&lt;IOT / FULLSTACK&gt;</div>
+                </div>
               </div>
             </div>
             
             <!-- Text Content -->
             <div class="flex-1 text-center md:text-left w-full">
-              <h1 class="text-3xl sm:text-4xl md:text-6xl mb-2 phosphor-glow">
+              <h1 id="main-title" class="text-3xl sm:text-4xl md:text-6xl mb-2 phosphor-glow">
                 HELLO WORLD!
               </h1>
               <div class="text-lg sm:text-xl md:text-2xl text-neon-cyan mb-1">
@@ -547,6 +592,8 @@
       📧 Contact
     </button>
     <div class="flex-1"></div>
+    <button id="btn-sound" class="win95-taskbar-btn font-bold" onclick="toggleSound()" title="Toggle sound effects" aria-pressed="false">🔊</button>
+    <div class="w-px h-6 bg-win95-gray mx-1"></div>
     <div class="text-black text-sm font-bold flex items-center gap-2">
       <span class="hidden sm:inline">⚡ FADEL-OS 95</span>
       <span class="bg-gray-300 px-2 py-0.5 border border-win95-gray" id="current-time">00:00:00</span>

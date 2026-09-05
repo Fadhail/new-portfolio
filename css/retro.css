@@ -811,3 +811,309 @@ section:nth-child(odd) .win95-window {
 section:nth-child(even) .win95-window {
   animation: slide-in-right 0.6s ease-out;
 }
+
+/* === Custom Retro Cursor === */
+body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M3 1 L3 17 L7.5 13.5 L9 17 L11 16 L9.5 12.5 L14 12 Z' fill='%23c0c0c0' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") 2 2, auto;
+}
+
+button, a, .win95-btn, .win95-action-btn, .win95-taskbar-btn, .desktop-icon-item, .win95-start-item, .social-icon, .context-menu-item, .win95-titlebar {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='13' viewBox='0 0 20 13'%3E%3Cpath d='M1 1 L13 12 L9 5 L15 5 Z' fill='%23ffffff' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") 1 1, pointer;
+}
+
+/* === Boot Screen === */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.4s ease;
+  cursor: pointer;
+}
+
+.boot-screen.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot-screen.is-removed {
+  display: none;
+}
+
+.boot-noise {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.06;
+}
+
+.boot-content {
+  position: relative;
+  text-align: center;
+  animation: boot-fade-in 0.5s ease-out;
+}
+
+.boot-logo {
+  font-size: 3.5rem;
+  letter-spacing: 6px;
+  color: #00ff41;
+  text-shadow: 0 0 15px #00ff41, 0 0 30px #00ff41;
+  margin-bottom: 2rem;
+  animation: boot-glow-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes boot-glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes boot-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.boot-progress-track {
+  width: 320px;
+  max-width: 80vw;
+  height: 22px;
+  background: #1a1a2e;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #000000,
+    inset -1px -1px 0 #808080;
+  overflow: hidden;
+}
+
+.boot-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  box-shadow: 0 0 10px rgba(0, 132, 208, 0.6);
+  transition: width 0.15s linear;
+}
+
+.boot-status {
+  margin-top: 1rem;
+  color: #00d4ff;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+/* === ASCII Particle Layer === */
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  background: none;
+}
+
+/* === Desktop Context Menu === */
+.context-menu {
+  position: fixed;
+  z-index: 3000;
+  min-width: 180px;
+  background: #c0c0c0;
+  border: 2px solid #ffffff;
+  border-right-color: #000000;
+  border-bottom-color: #000000;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.6);
+  padding: 3px;
+  font-size: 14px;
+}
+
+.context-menu.is-hidden {
+  display: none !important;
+}
+
+.context-menu-item {
+  padding: 5px 12px;
+  color: #000000;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.context-menu-item:hover {
+  background: #000080;
+  color: #ffffff;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: #808080;
+  border-bottom: 1px solid #ffffff;
+  margin: 3px 2px;
+}
+
+/* === About FADEL-OS Dialog === */
+.about-dialog {
+  position: fixed;
+  z-index: 3100;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  max-width: 90vw;
+  background: #1a1a2e;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000,
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.about-dialog.is-hidden {
+  display: none !important;
+}
+
+.about-dialog-titlebar {
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.about-dialog-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.about-dialog-logo {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 10px #ffcc00);
+}
+
+/* === Drag State === */
+.win95-window.is-dragging {
+  opacity: 0.92;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000;
+  transition: none !important;
+}
+
+.win95-titlebar {
+  cursor: grab;
+  touch-action: none;
+}
+
+.win95-titlebar:active {
+  cursor: grabbing;
+}
+
+/* === Glitch Effect === */
+.glitch-window .win95-titlebar {
+  animation: glitch-bar 0.18s steps(2, end) 2;
+}
+
+@keyframes glitch-bar {
+  0% { transform: translate(0, 0); filter: none; }
+  25% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+  50% { transform: translate(2px, -1px); filter: hue-rotate(-90deg); }
+  75% { transform: translate(-1px, -1px); filter: invert(0.1); }
+  100% { transform: translate(0, 0); filter: none; }
+}
+
+.hero h1,
+#main-title {
+  position: relative;
+  display: inline-block;
+}
+
+#main-title.is-glitching {
+  animation: glitch-text 0.2s steps(2, end) 2;
+}
+
+@keyframes glitch-text {
+  0% { text-shadow: 0 0 10px currentColor, 2px 0 #00d4ff, -2px 0 #ff00ff; clip-path: inset(0 0 0 0); transform: translateX(0); }
+  25% { text-shadow: 0 0 10px currentColor, -3px 0 #00d4ff, 3px 0 #ff00ff; clip-path: inset(20% 0 40% 0); transform: translateX(2px); }
+  50% { text-shadow: 0 0 10px currentColor, 3px 0 #00d4ff, -3px 0 #ff00ff; clip-path: inset(60% 0 5% 0); transform: translateX(-2px); }
+  75% { text-shadow: 0 0 10px currentColor, -2px 0 #00d4ff, 2px 0 #ff00ff; clip-path: inset(10% 0 70% 0); transform: translateX(1px); }
+  100% { text-shadow: 0 0 10px currentColor, 0 0 #00d4ff, 0 0 #ff00ff; clip-path: inset(0 0 0 0); transform: translateX(0); }
+}
+
+/* === Desktop Background Drift === */
+body {
+  animation: bg-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes bg-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 24px 0, 0 0; }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+    cursor: default;
+  }
+
+  button, a, .win95-btn, .win95-action-btn, .win95-taskbar-btn, .desktop-icon-item, .win95-start-item, .social-icon, .context-menu-item, .win95-titlebar {
+    cursor: pointer;
+  }
+
+  .hero h1,
+  .win95-window,
+  .crt-overlay,
+  .project-card,
+  .win95-action-btn {
+    animation: none !important;
+    transform: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .boot-logo {
+    animation: none;
+  }
+
+  .phosphor-glow {
+    text-shadow: none;
+  }
+
+  .particle-canvas {
+    display: none;
+  }
+}
+
+/* === Mobile & Touch adjustments for new components === */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    cursor: default;
+  }
+
+  button, a, .win95-btn, .win95-action-btn, .win95-taskbar-btn, .desktop-icon-item, .win95-start-item, .social-icon, .context-menu-item, .win95-titlebar {
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 767px) {
+  .boot-logo {
+    font-size: 2rem;
+    letter-spacing: 3px;
+  }
+
+  .boot-progress-track {
+    width: 240px;
+  }
+
+  .about-dialog {
+    width: 300px;
+  }
+}
