@@ -1379,3 +1379,151 @@ body {
     width: 300px;
   }
 }
+
+/* === Ask About Fadel chat === */
+.ask-messages {
+  background: #000000;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #000000,
+    inset -1px -1px 0 #808080;
+  height: 280px;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ask-msg {
+  max-width: 90%;
+  padding: 6px 10px;
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ask-msg-user {
+  align-self: flex-end;
+  background: #000080;
+  color: #ffffff;
+  border: 1px solid #00d4ff;
+  text-align: left;
+}
+
+.ask-msg-ai {
+  align-self: flex-start;
+  background: #0a0a0a;
+  color: #00ff41;
+  border: 1px solid #808080;
+}
+
+.ask-msg-ai .readable-text {
+  white-space: pre-wrap;
+}
+
+.ask-typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.ask-typing span {
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  animation: ask-blink 1s infinite;
+}
+
+.ask-typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ask-typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes ask-blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+.ask-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.ask-suggestion-chip,
+.ask-ref-chip {
+  font-family: 'VT323', monospace;
+  font-size: 0.95rem;
+  background: #c0c0c0;
+  color: #000000;
+  border: 2px solid #808080;
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000;
+  padding: 4px 10px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.ask-suggestion-chip:active {
+  box-shadow:
+    inset -1px -1px 0 #ffffff,
+    inset 1px 1px 0 #000000;
+}
+
+.ask-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ask-ref-chip button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ask-ref-chip a {
+  color: #000080;
+  text-decoration: none;
+}
+
+.ask-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ask-form .win95-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.ask-send-btn {
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .ask-messages {
+    height: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-typing span {
+    animation: none;
+    opacity: 1;
+  }
+}

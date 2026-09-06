@@ -116,6 +116,11 @@
         <span class="desktop-icon-title">Contact</span>
       </button>
 
+      <button type="button" class="desktop-icon-item" onclick="openWindow('win-ask')" title="Ask About Fadel" aria-label="Open Ask About Fadel">
+        <span class="desktop-icon-img" aria-hidden="true">🤖</span>
+        <span class="desktop-icon-title">Ask Fadel</span>
+      </button>
+
     </aside>
 
     <!-- Windows Container -->
@@ -348,6 +353,41 @@
         </div>
       </section>
 
+      <!-- Window 5: Ask About Fadel -->
+      <section id="win-ask" class="win95-window is-hidden is-inactive" data-window-name="Ask Fadel" onclick="focusWindow('win-ask')" tabindex="-1" aria-labelledby="title-win-ask" aria-hidden="true" inert>
+        <div class="win95-titlebar">
+          <span id="title-win-ask" class="win95-titlebar-text flex items-center gap-1">🤖 ask_fadel.exe</span>
+          <div class="win95-titlebar-buttons">
+            <button type="button" class="win95-btn" onclick="event.stopPropagation(); minimizeWindow('win-ask');" title="Minimize" aria-label="Minimize Ask About Fadel window">─</button>
+            <button type="button" class="win95-btn window-maximize" data-window-action="maximize" onclick="event.stopPropagation(); maximizeWindow('win-ask');" title="Maximize" aria-label="Maximize Ask About Fadel window">□</button>
+            <button type="button" class="win95-btn" onclick="event.stopPropagation(); closeWindow('win-ask');" title="Close" aria-label="Close Ask About Fadel window">×</button>
+          </div>
+        </div>
+        <div class="win95-content">
+
+          <!-- File Path Header -->
+          <div class="window-meta text-neon-cyan mb-3 text-sm flex justify-between items-center">
+            <span>C:\USERS\FADEL\ASK.EXE</span>
+            <span id="ask-status" class="text-gray-400" role="status">STATUS: READY</span>
+          </div>
+          <div class="window-divider" aria-hidden="true"></div>
+
+          <!-- Conversation -->
+          <div id="ask-messages" class="ask-messages" role="log" aria-live="polite" aria-label="Ask About Fadel conversation"></div>
+
+          <!-- Suggestion prompts -->
+          <div id="ask-suggestions" class="ask-suggestions" role="group" aria-label="Suggested questions"></div>
+
+          <!-- Input -->
+          <form id="ask-form" class="ask-form">
+            <label for="ask-input" class="sr-only">Ask something about Fadel</label>
+            <input id="ask-input" name="message" type="text" class="win95-input" placeholder="Ask about Fadel's projects, skills..." autocomplete="off" maxlength="500" required>
+            <button id="ask-send" type="submit" class="win95-action-btn ask-send-btn text-black font-bold">Send ➤</button>
+          </form>
+
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -368,6 +408,9 @@
       </button>
       <button type="button" class="win95-start-item" onclick="openWindow('win-contact'); toggleStartMenu();">
         <span>📧</span> contact_fadel.exe
+      </button>
+      <button type="button" class="win95-start-item" onclick="openWindow('win-ask'); toggleStartMenu();">
+        <span>🤖</span> ask_fadel.exe
       </button>
       <div class="win95-start-divider"></div>
       <a href="assets/docs/CV_Mochammad_Fadhail_Fijratullah.pdf" download="CV_Mochammad_Fadhail_Fijratullah.pdf" class="win95-start-item" onclick="toggleStartMenu();">
@@ -407,6 +450,9 @@
     <button type="button" id="task-win-contact" data-window-target="win-contact" data-window-label="Contact" class="win95-taskbar-btn" onclick="toggleWindow('win-contact')" aria-label="Open Contact" aria-current="false">
       <span aria-hidden="true">📧</span><span class="taskbar-label">Contact</span>
     </button>
+    <button type="button" id="task-win-ask" data-window-target="win-ask" data-window-label="Ask Fadel" class="win95-taskbar-btn" onclick="toggleWindow('win-ask')" aria-label="Open Ask About Fadel" aria-current="false">
+      <span aria-hidden="true">🤖</span><span class="taskbar-label">Ask</span>
+    </button>
     <div class="flex-1"></div>
     <button type="button" id="btn-sound" class="win95-taskbar-btn font-bold" onclick="toggleSound()" title="Enable sound effects" aria-label="Enable sound effects" aria-pressed="false">🔇</button>
     <div class="taskbar-divider w-px h-6 bg-win95-gray mx-1"></div>
@@ -417,6 +463,7 @@
   </nav>
 
   <script src="js/components/projects.js"></script>
+  <script src="js/components/ask-fadel.js"></script>
   <script src="js/effects.js"></script>
 </body>
 </html>
