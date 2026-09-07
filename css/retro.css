@@ -1384,6 +1384,7 @@ body {
 #win-ask {
   display: flex;
   flex-direction: column;
+  height: min(720px, calc(var(--app-height) - var(--taskbar-height) - 32px));
 }
 
 #win-ask .win95-content {
@@ -1391,6 +1392,8 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 #win-ask #ask-suggestions {
@@ -1404,6 +1407,7 @@ body {
 .ask-messages {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   background: #000000;
   border: 2px solid #808080;
   box-shadow:
@@ -1420,10 +1424,13 @@ body {
 
 .ask-msg {
   max-width: 90%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 6px 10px;
   font-size: 1rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ask-msg-user {
@@ -1441,8 +1448,66 @@ body {
   border: 1px solid #808080;
 }
 
-.ask-msg-ai .readable-text {
-  white-space: pre-wrap;
+.ask-msg .readable-text,
+.ask-msg .ask-markdown {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ask-markdown p,
+.ask-markdown h1,
+.ask-markdown h2,
+.ask-markdown h3,
+.ask-markdown ul,
+.ask-markdown ol,
+.ask-markdown pre {
+  margin: 0 0 0.65em;
+}
+
+.ask-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.ask-markdown h1,
+.ask-markdown h2,
+.ask-markdown h3 {
+  color: #00d4ff;
+  line-height: 1.2;
+}
+
+.ask-markdown ul,
+.ask-markdown ol {
+  padding-left: 1.35rem;
+}
+
+.ask-markdown a {
+  color: #00d4ff;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ask-markdown code {
+  font-family: var(--font-pixel);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ask-markdown pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 8px;
+  background: #161616;
+  color: #f3f3f3;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ask-markdown pre code {
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .ask-typing {
@@ -1543,7 +1608,7 @@ body {
   #win-ask {
     height: 100%;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   #win-ask .win95-content {
@@ -1551,7 +1616,7 @@ body {
     flex-direction: column;
     height: 100%;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
     padding: 6px;
   }
 
@@ -1564,6 +1629,7 @@ body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .ask-suggestions {

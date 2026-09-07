@@ -18,6 +18,101 @@
       .replace(/'/g, '&#039;');
   }
 
+  function renderInlineMarkdown(value) {
+    let html = escapeHtml(value);
+    const codeTokens = [];
+    const linkTokens = [];
+
+    html = html.replace(/`([^`\n]+)`/g, (_, code) => {
+      codeTokens.push(`<code>${code}</code>`);
+      return `\u0000${codeTokens.length - 1}\u0000`;
+    });
+    html = html.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, url) => {
+      linkTokens.push(`<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`);
+      return `\u0001${linkTokens.length - 1}\u0001`;
+    });
+    html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
+    html = html.replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>');
+    html = html.replace(/\u0001(\d+)\u0001/g, (_, index) => linkTokens[Number(index)]);
+    html = html.replace(/\u0000(\d+)\u0000/g, (_, index) => codeTokens[Number(index)]);
+    return html;
+  }
+
+  function renderMarkdown(value) {
+    const lines = String(value ?? '').replace(/\r\n?/g, '\n').split('\n');
+    const blocks = [];
+    let paragraph = [];
+    let list = null;
+    let code = null;
+
+    const flushParagraph = () => {
+      if (paragraph.length) {
+        blocks.push(`<p>${paragraph.map(renderInlineMarkdown).join('<br>')}</p>`);
+        paragraph = [];
+      }
+    };
+    const flushList = () => {
+      if (!list) return;
+      blocks.push(`<${list.type}>${list.items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</${list.type}>`);
+      list = null;
+    };
+
+    lines.forEach((line) => {
+      if (/^\s*```/.test(line)) {
+        flushParagraph();
+        flushList();
+        if (code === null) code = [];
+        else {
+          blocks.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`);
+          code = null;
+        }
+        return;
+      }
+      if (code !== null) {
+        code.push(line);
+        return;
+      }
+      if (!line.trim()) {
+        flushParagraph();
+        flushList();
+        return;
+      }
+      const heading = line.match(/^\s*(#{1,3})\s+(.+?)\s*#*\s*$/);
+      const item = line.match(/^\s*([-*+] |\d+\. )(.+)$/);
+      if (heading) {
+        flushParagraph();
+        flushList();
+        const level = heading[1].length;
+        blocks.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`);
+      } else if (item) {
+        flushParagraph();
+        const type = /^\d+\./.test(item[1]) ? 'ol' : 'ul';
+        if (!list || list.type !== type) {
+          flushList();
+          list = { type, items: [] };
+        }
+        list.items.push(item[2]);
+      } else {
+        flushList();
+        paragraph.push(line);
+      }
+    });
+
+    if (code !== null) blocks.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`);
+    flushParagraph();
+    flushList();
+    return blocks.join('') || '<p></p>';
+  }
+
+  function isNearBottom(container, threshold = 32) {
+    return container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
+  }
+
+  function scrollToLatest(container) {
+    container.scrollTop = container.scrollHeight;
+  }
+
   function slugify(value) {
     return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   }
@@ -85,7 +180,6 @@
     wrapper.className = role === 'user' ? 'ask-msg ask-msg-user' : 'ask-msg ask-msg-ai';
     wrapper.innerHTML = html;
     container.appendChild(wrapper);
-    container.scrollTop = container.scrollHeight;
     return wrapper;
   }
 
@@ -100,6 +194,7 @@
     if (!message || state.busy) return;
     state.busy = true;
 
+    scrollToLatest(state.messages);
     appendMessage(state.messages, 'user', `<span>${escapeHtml(message)}</span>`);
     state.suggestions.hidden = true;
     const typing = appendMessage(state.messages, 'ai', '<span class="ask-typing" aria-label="Fadel AI is typing"><span></span><span></span><span></span></span>');
@@ -124,9 +219,11 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
-      const answer = escapeHtml(data.answer || 'I received an empty response. Please try again.');
+      const keepLatestVisible = isNearBottom(state.messages);
+      const answer = data.answer || 'I received an empty response. Please try again.';
       const refs = renderReferences(data.references, state.projectIndex);
-      typing.innerHTML = `<span class="readable-text">${answer}</span>${refs}`;
+      typing.innerHTML = `<div class="readable-text ask-markdown">${renderMarkdown(answer)}</div>${refs}`;
+      if (keepLatestVisible) scrollToLatest(state.messages);
       state.status.textContent = 'STATUS: ONLINE';
     } catch (error) {
       clearTimeout(timer);
@@ -135,7 +232,7 @@
     } finally {
       state.busy = false;
       setBusy(state.form, state.input, state.button, false);
-      state.messages.scrollTop = state.messages.scrollHeight;
+      if (isNearBottom(state.messages)) scrollToLatest(state.messages);
       state.input.focus({ preventScroll: true });
     }
   }
@@ -174,6 +271,10 @@
       event.preventDefault();
       sendMessage(state, input.value);
       input.value = '';
+    });
+
+    input.addEventListener('focus', () => {
+      window.setTimeout(() => input.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 150);
     });
   }
 
